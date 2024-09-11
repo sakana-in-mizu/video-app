@@ -9,7 +9,7 @@
 #include "base/noncopyable.h"
 #include "base/nonmovable.h"
 
-class GLContext : Noncopyable, Nonmovable {
+class GLContext : Noncopyable, Nonmovable, std::enable_shared_from_this<GLContext> {
 public:
     using GL = GladGLContext;
 
@@ -26,9 +26,11 @@ public:
 
     GLFWwindow *getWindow() const { return m_window; }
 
-    void makeCurrentContext() const;
+    void makeCurrentContext();
     void detachContext() const;
     void swapBuffers() const;
+
+    static std::weak_ptr<GLContext> getCurrentContext() { return s_current_context; }
 
     const GL &getGL() const { return m_gl; }
 
@@ -39,6 +41,8 @@ private:
     };
 
     static std::weak_ptr<GLFWOwnership> s_glfw_existence;
+
+    static std::weak_ptr<GLContext> s_current_context;
 
     std::shared_ptr<GLFWOwnership> m_glfw_ownership {};
 

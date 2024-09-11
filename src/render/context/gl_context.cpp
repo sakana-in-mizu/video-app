@@ -4,6 +4,8 @@
 
 std::weak_ptr<GLContext::GLFWOwnership> GLContext::s_glfw_existence {};
 
+std::weak_ptr<GLContext> GLContext::s_current_context {};
+
 GLContext::GLFWOwnership::GLFWOwnership() {
     if (!glfwInit()) {
         FATAL("failed to initialize GLFW!");
@@ -28,15 +30,19 @@ std::shared_ptr<GLContext> GLContext::createWithWwindow(const WindowInfo &info) 
     return std::shared_ptr<GLContext> {new GLContext(info)};
 }
 
-void GLContext::makeCurrentContext() const {
+void GLContext::makeCurrentContext() {
     if (!m_window) {
         FATAL("invalid context!");
     }
 
     glfwMakeContextCurrent(m_window);
+    s_current_context = weak_from_this();
 }
 
-void GLContext::detachContext() const { glfwMakeContextCurrent(nullptr); }
+void GLContext::detachContext() const {
+    glfwMakeContextCurrent(nullptr);
+    s_current_context.reset();
+}
 
 void GLContext::swapBuffers() const {
     if (!m_window) {
