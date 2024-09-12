@@ -1,14 +1,17 @@
 #pragma once
 
+#define NONMOVABLE(T) \
+    T(T &&)            = delete; \
+    T &operator=(T &&) = delete;
+
 class Nonmovable {
 public:
-    virtual ~Nonmovable() {}
+    NONMOVABLE(Nonmovable)
 
-    Nonmovable(Nonmovable &&)      = delete;
-    Nonmovable(const Nonmovable &) = default;
-
-    Nonmovable &operator=(Nonmovable &&)      = delete;
+    Nonmovable(const Nonmovable &)            = default;
     Nonmovable &operator=(const Nonmovable &) = default;
+
+    virtual ~Nonmovable() {}
 
 protected:
     Nonmovable() = default;

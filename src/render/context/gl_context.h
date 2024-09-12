@@ -9,8 +9,13 @@
 #include "base/noncopyable.h"
 #include "base/nonmovable.h"
 
-class GLContext : Noncopyable, Nonmovable, std::enable_shared_from_this<GLContext> {
+class GLContext : public std::enable_shared_from_this<GLContext> {
+    friend class WindowManager;
+
 public:
+    NONCOPYABLE(GLContext)
+    NONMOVABLE(GLContext)
+
     using GL = GladGLContext;
 
     struct WindowInfo {
@@ -22,9 +27,7 @@ public:
 
     ~GLContext();
 
-    static std::shared_ptr<GLContext> createWithWwindow(const WindowInfo &info);
-
-    GLFWwindow *getWindow() const { return m_window; }
+    static std::shared_ptr<GLContext> createWithWindow(const WindowInfo &info, bool visible = true);
 
     void makeCurrentContext();
     void detachContext() const;
@@ -52,5 +55,5 @@ private:
 
     void getGLFWOwnership();
 
-    GLContext(const WindowInfo &info);
+    GLContext(const WindowInfo &info, bool visible);
 };

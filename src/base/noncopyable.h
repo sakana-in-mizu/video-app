@@ -1,14 +1,17 @@
 #pragma once
 
+#define NONCOPYABLE(T) \
+    T(const T &)            = delete; \
+    T &operator=(const T &) = delete;
+
 class Noncopyable {
 public:
+    NONCOPYABLE(Noncopyable)
+
+    Noncopyable(Noncopyable &&)           = default;
+    Noncopyable &operator=(Noncopyable &) = default;
+
     virtual ~Noncopyable() {}
-
-    Noncopyable(Noncopyable &&)      = default;
-    Noncopyable(const Noncopyable &) = delete;
-
-    Noncopyable &operator=(Noncopyable &)       = default;
-    Noncopyable &operator=(const Noncopyable &) = delete;
 
 protected:
     Noncopyable() = default;

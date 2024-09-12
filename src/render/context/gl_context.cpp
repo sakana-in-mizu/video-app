@@ -26,8 +26,8 @@ void GLContext::getGLFWOwnership() {
 
 GLContext::~GLContext() { glfwDestroyWindow(m_window); }
 
-std::shared_ptr<GLContext> GLContext::createWithWwindow(const WindowInfo &info) {
-    return std::shared_ptr<GLContext> {new GLContext(info)};
+std::shared_ptr<GLContext> GLContext::createWithWindow(const WindowInfo &info, bool visible) {
+    return std::shared_ptr<GLContext> {new GLContext(info, visible)};
 }
 
 void GLContext::makeCurrentContext() {
@@ -52,7 +52,7 @@ void GLContext::swapBuffers() const {
     glfwSwapBuffers(m_window);
 }
 
-GLContext::GLContext(const WindowInfo &info) {
+GLContext::GLContext(const WindowInfo &info, bool visible) {
     getGLFWOwnership();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -61,6 +61,8 @@ GLContext::GLContext(const WindowInfo &info) {
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
+
+    glfwWindowHint(GLFW_VISIBLE, visible);
 
     m_window = glfwCreateWindow(info.width, info.height, info.title.c_str(), nullptr, nullptr);
     if (!m_window) {
