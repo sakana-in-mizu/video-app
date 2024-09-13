@@ -50,7 +50,7 @@ private:
 
     static std::weak_ptr<GLFWOwnership> s_glfw_existence;
 
-    static std::weak_ptr<GLContext> s_current_context;
+    static thread_local std::weak_ptr<GLContext> s_current_context;
 
     std::shared_ptr<GLFWOwnership> m_glfw_ownership {};
 

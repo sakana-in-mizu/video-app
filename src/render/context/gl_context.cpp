@@ -5,7 +5,7 @@
 
 std::weak_ptr<GLContext::GLFWOwnership> GLContext::s_glfw_existence {};
 
-std::weak_ptr<GLContext> GLContext::s_current_context {};
+thread_local std::weak_ptr<GLContext> GLContext::s_current_context {};
 
 GLContext::GLFWOwnership::GLFWOwnership() {
     if (!glfwInit()) {
