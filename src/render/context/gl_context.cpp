@@ -1,6 +1,7 @@
 #include "gl_context.h"
 
 #include "log/log_system.h"
+#include "window_manager.h"
 
 std::weak_ptr<GLContext::GLFWOwnership> GLContext::s_glfw_existence {};
 
@@ -15,44 +16,15 @@ GLContext::GLFWOwnership::GLFWOwnership() {
 GLContext::GLFWOwnership::~GLFWOwnership() { glfwTerminate(); }
 
 void GLContext::getGLFWOwnership() {
-    if (!s_glfw_existence.expired()) {
-        m_glfw_ownership = s_glfw_existence.lock();
-    } else {
+    m_glfw_ownership = s_glfw_existence.lock();
+    if (!m_glfw_ownership) {
         m_glfw_ownership = std::make_shared<GLFWOwnership>();
         s_glfw_existence = m_glfw_ownership;
     }
     TRACE("GLFW owner: {}.", m_glfw_ownership.use_count());
 }
 
-GLContext::~GLContext() { glfwDestroyWindow(m_window); }
-
-std::shared_ptr<GLContext> GLContext::createWithWindow(const WindowInfo &info, bool visible) {
-    return std::shared_ptr<GLContext> {new GLContext(info, visible)};
-}
-
-void GLContext::makeCurrentContext() {
-    if (!m_window) {
-        FATAL("invalid context!");
-    }
-
-    glfwMakeContextCurrent(m_window);
-    s_current_context = weak_from_this();
-}
-
-void GLContext::detachContext() const {
-    glfwMakeContextCurrent(nullptr);
-    s_current_context.reset();
-}
-
-void GLContext::swapBuffers() const {
-    if (!m_window) {
-        FATAL("invalid context!");
-    }
-
-    glfwSwapBuffers(m_window);
-}
-
-GLContext::GLContext(const WindowInfo &info, bool visible) {
+GLContext::GLContext(const WindowInfo &info, bool visible) : m_visible(visible) {
     getGLFWOwnership();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -75,5 +47,37 @@ GLContext::GLContext(const WindowInfo &info, bool visible) {
         FATAL("failed to load function pointers!");
     }
     INFO("loaded OpenGL {}.{}", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
-    detachContext();
+    resetCurrentContext();
+}
+
+GLContext::~GLContext() { glfwDestroyWindow(m_window); }
+
+std::shared_ptr<GLContext> GLContext::createWithWindow(const WindowInfo &info, bool visible) {
+    return std::shared_ptr<GLContext> {new GLContext {info, visible}};
+}
+
+void GLContext::resetCurrentContext() {
+    glfwMakeContextCurrent(nullptr);
+    s_current_context.reset();
+}
+
+void GLContext::makeCurrentContext() {
+    if (!m_window) {
+        FATAL("invalid context!");
+    }
+
+    glfwMakeContextCurrent(m_window);
+    s_current_context = weak_from_this();
+}
+
+void GLContext::swapBuffers() const {
+    if (!m_window) {
+        FATAL("invalid context!");
+    }
+
+    glfwSwapBuffers(m_window);
+}
+
+std::shared_ptr<WindowManager> GLContext::createWindowManager() {
+    return std::shared_ptr<WindowManager> {new WindowManager {weak_from_this()}};
 }

@@ -1,7 +1,8 @@
 #include "config/config_manager.h"
 #include "log/log_system.h"
 
-#include "render/window/window_manager.h"
+#include "render/context/gl_context.h"
+#include "render/context/window_manager.h"
 
 int main(int argc, char **argv) {
     ConfigManager::get()->parse();
@@ -10,9 +11,8 @@ int main(int argc, char **argv) {
     auto ctx = GLContext::createWithWindow({800, 600, "video-app"});
     auto gl  = ctx->getGL();
 
+    auto wm = ctx->createWindowManager();
     ctx->makeCurrentContext();
-    auto wm = WindowManager::get();
-    wm->init(GLContext::getCurrentContext());
 
     while (!wm->shouldClose()) {
         wm->pollEvents();
@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
     }
 
     ctx.reset();
+
     LogSystem::get()->shutdown();
     return 0;
 }

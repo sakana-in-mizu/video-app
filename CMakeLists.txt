@@ -18,13 +18,18 @@ target_link_libraries(${PROJECT_NAME}
     spdlog
 )
 
-set(log_path ${CMAKE_BINARY_DIR}/logs)
+if(NOT DEFINED log_path)
+    set(log_path ${CMAKE_BINARY_DIR}/logs)
+endif()
 configure_file(
     ${CMAKE_SOURCE_DIR}/src/config_template.ini
     ${CMAKE_BINARY_DIR}/config.ini
     @ONLY
 )
-set(config_file_path  ${CMAKE_BINARY_DIR}/config.ini)
+
+if(NOT DEFINED config_file_path)
+    set(config_file_path  ${CMAKE_BINARY_DIR}/config.ini)
+endif()
 configure_file(
     ${CMAKE_SOURCE_DIR}/src/config/config_file_path.h.in
     ${CMAKE_BINARY_DIR}/config_file_path.h
