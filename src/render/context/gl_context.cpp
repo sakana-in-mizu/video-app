@@ -13,7 +13,10 @@ GLContext::GLFWOwnership::GLFWOwnership() {
     }
 }
 
-GLContext::GLFWOwnership::~GLFWOwnership() { glfwTerminate(); }
+GLContext::GLFWOwnership::~GLFWOwnership() {
+    glfwTerminate();
+    DEBUG("shutdown GLFW");
+}
 
 void GLContext::getGLFWOwnership() {
     m_glfw_ownership = s_glfw_existence.lock();
@@ -21,7 +24,7 @@ void GLContext::getGLFWOwnership() {
         m_glfw_ownership = std::make_shared<GLFWOwnership>();
         s_glfw_existence = m_glfw_ownership;
     }
-    TRACE("GLFW owner: {}.", m_glfw_ownership.use_count());
+    DEBUG("GLFW owner: {}", m_glfw_ownership.use_count());
 }
 
 GLContext::GLContext(const WindowInfo &info, bool visible) : m_visible(visible) {
@@ -50,7 +53,10 @@ GLContext::GLContext(const WindowInfo &info, bool visible) : m_visible(visible) 
     resetCurrentContext();
 }
 
-GLContext::~GLContext() { glfwDestroyWindow(m_window); }
+GLContext::~GLContext() {
+    glfwDestroyWindow(m_window);
+    DEBUG("release GLContext: {}", (void *)this);
+}
 
 std::shared_ptr<GLContext> GLContext::createWithWindow(const WindowInfo &info, bool visible) {
     return std::shared_ptr<GLContext> {new GLContext {info, visible}};
@@ -79,5 +85,5 @@ void GLContext::swapBuffers() const {
 }
 
 std::shared_ptr<WindowManager> GLContext::createWindowManager() {
-    return std::shared_ptr<WindowManager> {new WindowManager {weak_from_this()}};
+    return std::shared_ptr<WindowManager> {new WindowManager {shared_from_this()}};
 }

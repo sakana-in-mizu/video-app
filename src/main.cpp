@@ -12,6 +12,11 @@ int main(int argc, char **argv) {
     auto gl  = ctx->getGL();
 
     auto wm = ctx->createWindowManager();
+    wm->registerOnKeyFunc([](WindowManager *wm, int key, int scancode, int action, int mods) {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+            wm->setShouldClose(true);
+        }
+    });
     ctx->makeCurrentContext();
 
     while (!wm->shouldClose()) {
@@ -23,6 +28,7 @@ int main(int argc, char **argv) {
         ctx->swapBuffers();
     }
 
+    wm.reset();
     ctx.reset();
 
     LogSystem::get()->shutdown();
