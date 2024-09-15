@@ -4,6 +4,10 @@ project(video-app CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 
+if (NOT APPLE)
+    message(WARNING "This project is only tested on macOS. Building on other platforms is not guaranteed to work.")
+endif()
+
 file(GLOB_RECURSE video_app_src src/*.cpp src/*.c)
 file(GLOB_RECURSE video_app_inc src/*.h src/*.hpp)
 
@@ -13,6 +17,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty)
 
 add_executable(${PROJECT_NAME} ${video_app_src} ${video_app_inc})
 target_link_libraries(${PROJECT_NAME}
+    ffmpeg
     glad_gl_core_mx_41
     glfw
     spdlog

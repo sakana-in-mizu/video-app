@@ -5,9 +5,7 @@
 
 #include "config_file_path.h"
 
-ConfigManager::ConfigManager() {
-    m_config_file_path = CONFIG_FILE_PATH;
-}
+ConfigManager::ConfigManager() { m_config_file_path = CONFIG_FILE_PATH; }
 
 std::string trim(const std::string &str) {
     const char *whitespace = " \t\n\r\f\v";
@@ -43,7 +41,7 @@ void ConfigManager::parse() {
             if (equal_pos == std::string::npos) {
                 continue;
             }
-            std::string key   = trim(line.substr(0, equal_pos));
+            std::string key = trim(line.substr(0, equal_pos));
             std::string value = trim(line.substr(equal_pos + 1));
 
             m_result[section][key] = value;

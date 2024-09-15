@@ -27,7 +27,7 @@ void GLContext::getGLFWOwnership() {
     DEBUG("GLFW owner: {}", m_glfw_ownership.use_count());
 }
 
-GLContext::GLContext(const WindowInfo &info, bool visible) : m_visible(visible) {
+GLContext::GLContext(const WindowInfo &info, bool visible) {
     getGLFWOwnership();
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
