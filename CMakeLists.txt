@@ -20,11 +20,12 @@ target_link_libraries(${PROJECT_NAME}
     ffmpeg
     glad_gl_core_mx_41
     glfw
+    OpenAL
     spdlog
 )
 
-if(NOT DEFINED log_path)
-    set(log_path ${CMAKE_BINARY_DIR}/logs)
+if(NOT DEFINED VA_LOG_PATH)
+    set(VA_LOG_PATH ${CMAKE_BINARY_DIR}/logs)
 endif()
 configure_file(
     ${CMAKE_SOURCE_DIR}/src/config_template.ini
@@ -32,8 +33,8 @@ configure_file(
     @ONLY
 )
 
-if(NOT DEFINED config_file_path)
-    set(config_file_path  ${CMAKE_BINARY_DIR}/config.ini)
+if(NOT DEFINED VA_CONFIG_PATH)
+    set(VA_CONFIG_PATH  ${CMAKE_BINARY_DIR}/config.ini)
 endif()
 configure_file(
     ${CMAKE_SOURCE_DIR}/src/config/config_file_path.h.in

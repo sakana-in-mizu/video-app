@@ -1,3 +1,6 @@
+# This script use pkg-config to find ffmpeg,
+# which works well on Unix-like systems but may not work on Windows. 
+
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(AVCODEC     REQUIRED IMPORTED_TARGET libavcodec)
