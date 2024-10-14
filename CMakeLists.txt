@@ -15,6 +15,10 @@ source_group(TREE ${CMAKE_SOURCE_DIR}/src FILES ${video_app_src} ${video_app_inc
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/3rdparty)
 
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(GL_ERROR_CHECK)
+endif()
+
 add_executable(${PROJECT_NAME} ${video_app_src} ${video_app_inc})
 target_link_libraries(${PROJECT_NAME}
     ffmpeg

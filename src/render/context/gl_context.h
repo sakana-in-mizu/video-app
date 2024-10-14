@@ -8,6 +8,7 @@
 
 #include "base/noncopyable.h"
 #include "base/nonmovable.h"
+#include "log/log_system.h"
 
 class WindowManager;
 
@@ -105,3 +106,58 @@ private:
 
     GLContext(const WindowInfo &info, bool visible);
 };
+
+inline const char *glErrorString(GLenum err) {
+    switch (err) {
+        case GL_INVALID_ENUM:
+            return "INVALID_ENUM";
+        case GL_INVALID_VALUE:
+            return "INVALID_VALUE";
+        case GL_INVALID_OPERATION:
+            return "GINVALID_OPERATION";
+        case GL_OUT_OF_MEMORY:
+            return "OUT_OF_MEMORY";
+        case GL_INVALID_FRAMEBUFFER_OPERATION:
+            return "INVALID_FRAMEBUFFER_OPERATION";
+        default:
+            return "UNKNOWN_ERROR";
+    }
+}
+
+template<typename GlFunction, typename... Params>
+auto glCallImpl(const char *file,
+                int line,
+                const char *function,
+                GLContext *ctx,
+                GlFunction glFunction,
+                Params... params) -> std::enable_if_t<std::is_same_v<void, decltype(glFunction(params...))>> {
+    glFunction(params...);
+    auto logger = LogSystem::get()->getLogger();
+    GLenum err;
+    while ((err = ctx->getGL().GetError()) != GL_NO_ERROR) {
+        logger->log({file, line, function}, spdlog::level::err, "OpenGL error: {}", glErrorString(err));
+    }
+}
+
+template<typename GlFunction, typename... Params>
+auto glCallImpl(const char *file,
+                int line,
+                const char *function,
+                GLContext *ctx,
+                GlFunction glFunction,
+                Params... params)
+    -> std::enable_if_t<!std::is_same_v<void, decltype(glFunction(params...))>, decltype(glFunction(params...))> {
+    auto ret = glFunction(params...);
+    auto logger = LogSystem::get()->getLogger();
+    GLenum err;
+    while ((err = ctx->getGL().GetError()) != GL_NO_ERROR) {
+        logger->log({file, line, function}, spdlog::level::err, "OpenGL error: {}", glErrorString(err));
+    }
+    return ret;
+}
+
+#ifdef GL_ERROR_CHECK
+#define glCall(ctx, func, ...) glCallImpl(__FILE__, __LINE__, __FUNCTION__, ctx.get(), ctx->getGL().func, __VA_ARGS__)
+#else
+#define glCall(ctx, func, ...) ctx->getGL().func(__VA_ARGS__)
+#endif

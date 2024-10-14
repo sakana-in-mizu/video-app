@@ -20,7 +20,7 @@ if [ $generator = "Ninja" ]; then
     definitions="$definitions -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
 fi
 
-cmake $definitions -B build -G "$generator"
+cmake $definitions  -DCMAKE_BUILD_TYPE=$config -B build -G "$generator"
 if [ $generator = "Ninja" ]; then
     mkdir -p .vscode
     cp build/compile_commands.json .vscode
